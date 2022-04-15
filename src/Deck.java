@@ -39,3 +39,4 @@ public class Deck {
 		Card playerCard = mCards.get(index);
 		return playerCard;
 	}
+}
