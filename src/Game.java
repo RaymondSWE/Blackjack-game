@@ -140,7 +140,7 @@ public class Game extends JFrame {
             quit_btn.setBounds(5, 515, 128, 25);
 
             //---- balance_lbl ----
-            balance_lbl.setText(Integer.toString(board.getPlayer().getBalance()));
+            balance_lbl.setText(Integer.toString(Board.getPlayerScore().getBalance()));
             balance_lbl.setHorizontalAlignment(SwingConstants.CENTER);
             balance_lbl.setFont(new Font("MOSFET", Font.BOLD, 12));
             balance_lbl.setBackground(new Color(2, 51, 153));
@@ -159,7 +159,7 @@ public class Game extends JFrame {
             bet_lbl.setBounds(315, 500, 130, 40);
 
             //---- playerName_lbl ----
-            playerName_lbl.setText(board.getPlayer().getName());
+            playerName_lbl.setText(Board.getPlayerScore().getName());
             playerName_lbl.setHorizontalAlignment(SwingConstants.LEFT);
             playerName_lbl.setFont(new Font("Arial Black", Font.BOLD, 12));
             playerName_lbl.setForeground(Color.WHITE);

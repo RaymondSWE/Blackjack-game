@@ -1,42 +1,35 @@
+import java.awt.Image;
+
 public class Card {
 
-	private String mSuit;
-	private String mRank;
-	private int mValue;
-	private String mImagePath = "../Cardimages/";
+    private final String suit;
+    private final String rank;
+    private final int cardValue;
+    private final String imagePath ;
+    private Image image;
 
-	public Card(String rank, String suit, int value) {
-		this.mSuit = suit;
-		this.mRank = rank;
-		this.mValue = value;
-		setFullImagePath();
-	}
+    public Card(String rank, String suit, int value) {
+        this.suit = suit;
+        this.rank = rank;
+        this.cardValue = value;
+        imagePath = "Images\\Cardimages\\" + rank + "\\" + suit + ".png";
+        image = null;
+    }
 
-	// this function returns a string and expects no input.
-	public String getSuit() {
-		return mSuit;
-	}
+    public void setImage(Image image){
+        this.image = image;
+    }
 
-	// this function returns a string and expects no input
-	public String getRank() {
-		return mRank;
-	}
+    public Image getImage(){
+        return image;
+    }
 
-	// this function returns an int and expects no input
-	public int getValue() {
-		return mValue;
-	}
-	
-	public String getFullImagePath() {
-		return mImagePath;
-		
-	}
+    public int getValue() {
+        return cardValue;
+    }
 
-	// this function sets the complete path to the image of the card based on suit.
-	// it takes no input.
-	private void setFullImagePath()
-     {
-		mImagePath+=mSuit+"/"+mRank+".png";
-     }
+    public String getFullImagePath() {
+        return imagePath;
+    }
 
 }
