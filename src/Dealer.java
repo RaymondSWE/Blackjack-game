@@ -1,9 +1,9 @@
-
 public class Dealer {
 
-	private int mScore = 0;
+	private int mScore;
 
 	public Dealer() {
+		mScore = 0;
 	}
 
 	public int getScore() {
@@ -11,7 +11,7 @@ public class Dealer {
 	}
 
 	public void setScore(int Score) {
-		this.mScore += Score;
+		this.mScore = Score;
 	}
 
 }
