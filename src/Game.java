@@ -18,14 +18,20 @@ public class Game extends JFrame {
     private final JLabel playerName_lbl;
     private final JLabel dealerName_lbl;
     private final JLabel background_lbl;
+    private final Board board;
     private int betAmount;
     private boolean isDealerTurn;
 
     public Game(String name, int balance) {
         isDealerTurn = false;
         betAmount = 0;
+        board = new Board(name, balance);
         main_pnl = new JPanel();
-        display_pnl = new JPanel(); // Will add cards to this display
+        display_pnl = new JPanel() {
+            public void paint(Graphics graphics) {
+                paintCards(graphics);
+            }
+        };
         hit_btn = new JButton();
         stand_btn = new JButton();
         bet_btn = new JButton();
@@ -85,7 +91,7 @@ public class Game extends JFrame {
             hit_btn.addMouseListener(new MouseAdapter() {
                 @Override
                 public void mouseClicked(MouseEvent e) {
-                    
+                    hit_btnMouseClicked();
                 }
             });
             main_pnl.add(hit_btn);
@@ -100,7 +106,7 @@ public class Game extends JFrame {
             stand_btn.addMouseListener(new MouseAdapter() {
                 @Override
                 public void mouseClicked(MouseEvent e) {
-                    
+                    stand_btnMouseClicked();
                 }
             });
             main_pnl.add(stand_btn);
@@ -115,7 +121,7 @@ public class Game extends JFrame {
             bet_btn.addMouseListener(new MouseAdapter() {
                 @Override
                 public void mouseClicked(MouseEvent e) {
-                    
+                    bet_btnMouseClicked();
                 }
             });
             main_pnl.add(bet_btn);
@@ -133,14 +139,14 @@ public class Game extends JFrame {
             quit_btn.addMouseListener(new MouseAdapter() {
                 @Override
                 public void mouseClicked(MouseEvent e) {
-                    
+                    quit_btnMouseClicked();
                 }
             });
             main_pnl.add(quit_btn);
             quit_btn.setBounds(5, 515, 128, 25);
 
             //---- balance_lbl ----
-            balance_lbl.setText(Integer.toString(Board.getPlayerScore().getBalance()));
+            balance_lbl.setText(Integer.toString(board.getPlayer().getBalance()));
             balance_lbl.setHorizontalAlignment(SwingConstants.CENTER);
             balance_lbl.setFont(new Font("MOSFET", Font.BOLD, 12));
             balance_lbl.setBackground(new Color(2, 51, 153));
@@ -159,7 +165,7 @@ public class Game extends JFrame {
             bet_lbl.setBounds(315, 500, 130, 40);
 
             //---- playerName_lbl ----
-            playerName_lbl.setText(Board.getPlayerScore().getName());
+            playerName_lbl.setText(board.getPlayer().getName());
             playerName_lbl.setHorizontalAlignment(SwingConstants.LEFT);
             playerName_lbl.setFont(new Font("Arial Black", Font.BOLD, 12));
             playerName_lbl.setForeground(Color.WHITE);
@@ -178,6 +184,142 @@ public class Game extends JFrame {
             background_lbl.setIcon(new ImageIcon("Images\\image.png"));
             main_pnl.add(background_lbl);
             background_lbl.setBounds(0, 0, 770, 550);
+
+            {
+                // compute preferred size
+                Dimension preferredSize = new Dimension();
+                for (int i = 0; i < main_pnl.getComponentCount(); i++) {
+                    Rectangle bounds = main_pnl.getComponent(i).getBounds();
+                    preferredSize.width = Math.max(bounds.x + bounds.width, preferredSize.width);
+                    preferredSize.height = Math.max(bounds.y + bounds.height, preferredSize.height);
+                }
+                Insets insets = main_pnl.getInsets();
+                preferredSize.width += insets.right;
+                preferredSize.height += insets.bottom;
+                main_pnl.setMinimumSize(preferredSize);
+                main_pnl.setPreferredSize(preferredSize);
+            }
+        }
+        contentPane.add(main_pnl);
+        main_pnl.setBounds(0, 0, 770, 550);
+
+        {
+            // compute preferred size
+            Dimension preferredSize = new Dimension();
+            for (int i = 0; i < contentPane.getComponentCount(); i++) {
+                Rectangle bounds = contentPane.getComponent(i).getBounds();
+                preferredSize.width = Math.max(bounds.x + bounds.width, preferredSize.width);
+                preferredSize.height = Math.max(bounds.y + bounds.height, preferredSize.height);
+            }
+            Insets insets = contentPane.getInsets();
+            preferredSize.width += insets.right;
+            preferredSize.height += insets.bottom;
+            contentPane.setMinimumSize(preferredSize);
+            contentPane.setPreferredSize(preferredSize);
+        }
+        pack();
+        setLocationRelativeTo(getOwner());
+    }
+
+    private void bet_btnMouseClicked() {
+        String betValue = bet_txt.getText();
+        if (!betValue.isBlank() || !betValue.isEmpty()) {
+            try {
+                if (Integer.parseInt(betValue) <= board.getPlayer().getBalance() && Integer.parseInt(betValue) > 0) {
+                    board.getPlayer().setBalance(board.getPlayer().getBalance() - (betAmount = Integer.parseInt(betValue)));
+                    balance_lbl.setText(Integer.toString(board.getPlayer().getBalance()));
+                    bet_lbl.setText("BET : " + betValue + "$");
+                    bet_txt.setText("");
+                    balance_lbl.setText(Integer.toString(board.getPlayer().getBalance()));
+                    hit_btn.setEnabled(true);
+                    stand_btn.setEnabled(true);
+                    bet_txt.setEnabled(false);
+                    bet_btn.setEnabled(false);
+                    board.dealCards();
+                    playerName_lbl.setText(board.getPlayer().getName() + " : " + board.getPlayer().getScore());
+                    isDealerTurn = false;
+                    main_pnl.repaint();
+                    return;
+                }
+            } catch (NumberFormatException ignored) {
+
+            }
+        }
+        JOptionPane.showMessageDialog(rootPane, "Invalid Bet Value!", "Error Message", JOptionPane.ERROR_MESSAGE);
+    }
+
+    private void quit_btnMouseClicked() {
+        this.setVisible(false);
+        new MainMenu().setVisible(true);
+    }
+
+    private void hit_btnMouseClicked() {
+        board.playerHit();
+        playerName_lbl.setText(board.getPlayer().getName() + " : " + board.getPlayer().getScore());
+        main_pnl.repaint();
+        if (board.getPlayer().getScore() > 21) {
+            processRequest(board.getPlayer().getBalance(), "BUST!");
+            if (board.getPlayer().getBalance() == 0) {
+                JOptionPane.showMessageDialog(rootPane, "You Lost, Your Balance is 0$!", "Error Message", JOptionPane.ERROR_MESSAGE);
+                this.setVisible(false);
+                new MainMenu().setVisible(true);
+            }
+        } else if (board.getPlayer().getScore() == 21)
+            processRequest(board.getPlayer().getBalance() + betAmount + board.getDealer().getScore() != 21 ? (betAmount / 2) : 0, "BLACK-JACK!");
+    }
+
+    private void stand_btnMouseClicked() {
+        while (board.getDealer().getScore() < 21)
+            board.dealerHit();
+        playerName_lbl.setText(board.getPlayer().getName() + " : " + board.getPlayer().getScore());
+        main_pnl.repaint();
+        if (board.getDealer().getScore() > 21)
+            processRequest(board.getPlayer().getBalance() + betAmount * 2, "SETTLEMENT!");
+        else if (board.getDealer().getScore() == 21) {
+            if (board.getPlayer().getScore() == 21) {
+                processRequest(board.getPlayer().getBalance() + betAmount, "DRAW!");
+                return;
+            }
+            processRequest(board.getPlayer().getBalance(), "BUST!");
         }
     }
+
+    private void processRequest(int newBalance, String roundMessage) {
+        board.getPlayer().setBalance(newBalance);
+        balance_lbl.setText(Integer.toString(newBalance));
+        betAmount = 0;
+        bet_lbl.setText("BET : 0$");
+        board.setDeckIndex(0);
+        isDealerTurn = true;
+        dealerName_lbl.setText("DEALER : " + board.getDealer().getScore());
+        main_pnl.repaint();
+        JOptionPane.showMessageDialog(rootPane, roundMessage, "INFORMATION MESSAGE", JOptionPane.INFORMATION_MESSAGE);
+        hit_btn.setEnabled(false);
+        stand_btn.setEnabled(false);
+        bet_btn.setEnabled(true);
+        bet_txt.setEnabled(true);
+        board.resetBoard();
+        dealerName_lbl.setText("DEALER");
+        playerName_lbl.setText(board.getPlayer().getName());
+        main_pnl.repaint();
+    }
+
+    private void paintCards(Graphics graphics){
+        int dealerCardXMargin = 0;
+        int playerCardXMargin = 0;
+        int cardMargin = 25;
+        for (Card card : board.getCurrentDealerCards()) {
+            graphics.drawImage(card.getImage(), ((display_pnl.getWidth() / 2) - (board.getCurrentDealerCards().size() * 50 / 2)) + dealerCardXMargin, display_pnl.getY() - 30, this);
+            dealerCardXMargin += cardMargin;
+            if(!isDealerTurn){
+                graphics.drawImage(board.getDeck().getBackCover(), ((display_pnl.getWidth() / 2) - (board.getCurrentDealerCards().size() * 50 / 2)) + dealerCardXMargin, display_pnl.getY() - 30, this);
+                break;
+            }
+        }
+        for (Card card : board.getCurrentPlayerCards()) {
+            graphics.drawImage(card.getImage(), ((display_pnl.getWidth() / 2) - (board.getCurrentPlayerCards().size() * 50 / 2)) + playerCardXMargin, display_pnl.getHeight() - 100, this);
+            playerCardXMargin += cardMargin;
+        }
+    }
+
 }
