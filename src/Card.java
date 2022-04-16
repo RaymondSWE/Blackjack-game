@@ -13,7 +13,6 @@ public class Card {
         this.rank = rank;
         this.cardValue = value;
         imagePath = "Images\\Cardimages\\" + rank + "\\" + suit + ".png";
-        
     }
 
     public void setImage(Image image){

@@ -2,111 +2,71 @@
 import java.util.ArrayList;
 
 public class Board {
-	private Deck mDeck = new Deck();
-	private ArrayList<Card> mPlayerCards = new ArrayList<Card>();
-	private ArrayList<Card> mDealerCards = new ArrayList<Card>();
-	private Player mPlayer;
-	private int mCardIndex = 0;
-	private Dealer mDealer = new Dealer();
 
-	public Board(String name, int balance) {
-		mDeck.shuffleDeck();
-		mPlayer = new Player(name, balance);
-	}
+	private final Deck deck;
+	private final ArrayList<Card> playerCards;
+	private final ArrayList<Card> dealerCards;
+	private final Player player;
+	private final Dealer dealer;
+	private int deckIndex;
 
-	private void increaseCardIndex(int value) {
-		mCardIndex += value;
-		if (mCardIndex == 51) {
-			mDeck.shuffleDeck();
-			mCardIndex = 0;
-		}
-
+	public Board(String playerName, int playerBalance) {
+		deck = new Deck();
+		playerCards = new ArrayList<>();
+		dealerCards = new ArrayList<>();
+		deckIndex = 0;
+		player = new Player(playerName, playerBalance);
+		dealer = new Dealer();
+		deck.shuffleDeck();
 	}
 
 	public void playerHit() {
-		mPlayerCards.add(mDeck.getPlayerCards(mCardIndex));
-		int playerScore = mPlayerCards.get(mCardIndex).getValue();
-		mPlayer.setScore(playerScore);
-		increaseCardIndex(1);
+		playerCards.add(deck.getPlayerCards(deckIndex));
+		player.setScore(deck.getPlayerCards(deckIndex++).getValue() + player.getScore());
 	}
 
 	public void dealerHit() {
-		int dealerScore = 0;
-		mDealerCards.add(mDeck.getPlayerCards(mCardIndex));
-		dealerScore = mDealerCards.get(mCardIndex).getValue();
-		mDealer.setScore(dealerScore);
-		increaseCardIndex(1);
-
+		dealerCards.add(deck.getPlayerCards(deckIndex));
+		dealer.setScore(deck.getPlayerCards(deckIndex++).getValue() + dealer.getScore());
 	}
 
 	public void dealCards() {
 		for (int i = 0; i < 2; i++) {
-			mDealerCards.add(mDeck.getPlayerCards(mCardIndex));
-			increaseCardIndex(1);
-
+			dealerHit();
+			playerHit();
 		}
-
-		for (int i = 0; i < 2; i++) {
-			increaseCardIndex(1);
-			mPlayerCards.add(mDeck.getPlayerCards(mCardIndex));
-			mPlayer.setScore(mPlayerCards.get(i).getValue());
-		}
-		//we increase the card index again to make sure that when a hit is done that we don't give out the same card.
-		increaseCardIndex(1);
-
-	}
-
-	public void setBalance(int balance) {
-		mPlayer.setBalance(balance);
-	}
-	
-	public int getBalance() {
-		return mPlayer.getBalance();
-	}
-
-	public boolean isEmptyBalance() {
-		if (mPlayer.getBalance() == 0)
-			return true;
-		else
-			return false;
-	}
-
-	public int getPlayerScore() {
-		return mPlayer.getScore();
-
-	}
-
-	public int getDealerScore() {
-		return mDealer.getScore();
-	}
-
-	public void increaseBalance(int bet) {
-		int balance = mPlayer.getBalance();
-		balance += bet;
-		mPlayer.setBalance(balance);
-
-	}
-
-	public void decreaseBalance(int bet) {
-		int balance = mPlayer.getBalance();
-		balance -= bet;
-		mPlayer.setBalance(balance);
-
 	}
 
 	public ArrayList<Card> getCurrentPlayerCards() {
-		return mPlayerCards;
+		return playerCards;
 	}
 
 	public ArrayList<Card> getCurrentDealerCards() {
-		return mDealerCards;
+		return dealerCards;
 	}
 
-	public void clearGameCards() {
-		mDealerCards.clear();
-		mPlayerCards.clear();
-		mCardIndex = 0;
-		mDeck.shuffleDeck();
+	public void resetBoard() {
+		dealerCards.clear();
+		playerCards.clear();
+		deckIndex = 0;
+		player.setScore(0);
+		dealer.setScore(0);
+		deck.shuffleDeck();
+	}
 
+	public void setDeckIndex(int deckIndex) {
+		this.deckIndex = deckIndex;
+	}
+
+	public Player getPlayer() {
+		return player;
+	}
+
+	public Dealer getDealer() {
+		return dealer;
+	}
+
+	public Deck getDeck() {
+		return deck;
 	}
 }
