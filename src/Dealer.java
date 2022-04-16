@@ -13,5 +13,4 @@ public class Dealer {
 	public void setScore(int Score) {
 		this.mScore = Score;
 	}
-
 }

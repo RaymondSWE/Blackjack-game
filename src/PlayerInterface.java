@@ -1,13 +1,12 @@
 public interface PlayerInterface {
-    String getName();
+	String getName();
 
-    int getScore();
+	int getScore();
 
-    void setScore(int score);
+	void setScore(int score);
 
-    int getBalance();
+	int getBalance();
 
-    void setBalance(int balance);
+	void setBalance(int balance);
 
 }
-
