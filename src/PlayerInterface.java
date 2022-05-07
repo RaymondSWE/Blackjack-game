@@ -1,4 +1,6 @@
+
 public interface PlayerInterface {
+	// Player's interface for polymorphism
 	String getName();
 
 	int getScore();

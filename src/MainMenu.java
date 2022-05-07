@@ -22,6 +22,12 @@ public class MainMenu extends JFrame {
 		title_lbl = new JLabel();
 		initComponents();
 	}
+	/*
+	 * When start mouse button is pressed then get the name and balance from the
+	 * text fields. if name or balance is empty filed then show the error message.
+	 * If the balance value was not an integer then show the error message otherwise
+	 * set this window's visibility to false and start a new Game()
+	 */
 
 	private void start_btnMousePressed() {
 		String name = this.Name_txt.getText();

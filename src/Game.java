@@ -22,11 +22,13 @@ public class Game extends JFrame {
 	private int betAmount;
 	private boolean isDealerTurn;
 
+	// New game with player name and balance
 	public Game(String name, int balance) {
 		isDealerTurn = false;
 		betAmount = 0;
 		board = new Board(name, balance);
 		main_pnl = new JPanel();
+		// Paint cards on the panel
 		display_pnl = new JPanel() {
 			public void paint(Graphics graphics) {
 				paintCards(graphics);
@@ -219,8 +221,15 @@ public class Game extends JFrame {
 		pack();
 		setLocationRelativeTo(getOwner());
 	}
+	/*
+	 * If bet button is pressed then get the text of the bet If the bet text is
+	 * empty or the bet is not an integer or the bet makes the balance to be a
+	 * negative value then print the error message. Otherwise repaint the cards by
+	 * starting the new round
+	 */
 
 	private void bet_btnMouseClicked() {
+
 		String betValue = bet_txt.getText();
 		if (!betValue.isBlank() || !betValue.isEmpty()) {
 			try {
@@ -248,10 +257,20 @@ public class Game extends JFrame {
 		JOptionPane.showMessageDialog(rootPane, "Invalid Bet Value!", "Error Message", JOptionPane.ERROR_MESSAGE);
 	}
 
+	// If quit button is pressed then return back
+	// to main menu
 	private void quit_btnMouseClicked() {
 		this.setVisible(false);
 		new MainMenu().setVisible(true);
 	}
+
+	/*
+	 * When player hits then get a card and update players score and repaint the
+	 * board. if the player has score > 21 then it is a bust. And for the next round
+	 * if the players balance is 0 then return to the main menu and print the error
+	 * for insufficient balance. However if it is 21 then it is a black jack and
+	 * player wins its bet back
+	 */
 
 	private void hit_btnMouseClicked() {
 		board.playerHit();
@@ -271,6 +290,12 @@ public class Game extends JFrame {
 							: 0,
 					"BLACK-JACK!");
 	}
+	/*
+	 * If stand button is pressed then dealer gets hit till his score is less than
+	 * 21. If the dealer score is > 21 then it is a settlement if it is 21 and
+	 * players score is also 21 then its a draw. If dealer is on 21 and player is
+	 * under 21 then its a Bust again
+	 */
 
 	private void stand_btnMouseClicked() {
 		while (board.getDealer().getScore() < 21)
@@ -288,12 +313,16 @@ public class Game extends JFrame {
 		}
 	}
 
+	/*
+	 * As same code is repeated for each button pressed. So I made a function that
+	 * gets recalled when to reset the board.
+	 */
+
 	private void processRequest(int newBalance, String roundMessage) {
 		board.getPlayer().setBalance(newBalance);
 		balance_lbl.setText(Integer.toString(newBalance));
 		betAmount = 0;
 		bet_lbl.setText("BET : 0$");
-		board.setDeckIndex(0);
 		isDealerTurn = true;
 		dealerName_lbl.setText("DEALER : " + board.getDealer().getScore());
 		main_pnl.repaint();
@@ -308,16 +337,23 @@ public class Game extends JFrame {
 		main_pnl.repaint();
 	}
 
+	/*
+	 * Paints cards on the board
+	 */
+
 	private void paintCards(Graphics graphics) {
 		int dealerCardXMargin = 0;
 		int playerCardXMargin = 0;
 		int cardMargin = 25;
+		// Paint dealer cards
+		// Draw card image with x and y
 		for (Card card : board.getCurrentDealerCards()) {
 			graphics.drawImage(card.getImage(),
 					((display_pnl.getWidth() / 2) - (board.getCurrentDealerCards().size() * 50 / 2))
 							+ dealerCardXMargin,
 					display_pnl.getY() - 30, this);
 			dealerCardXMargin += cardMargin;
+			// if its not dealer turn then paint to back cover as 2nd
 			if (!isDealerTurn) {
 				graphics.drawImage(board.getDeck().getBackCover(),
 						((display_pnl.getWidth() / 2) - (board.getCurrentDealerCards().size() * 50 / 2))
@@ -326,6 +362,7 @@ public class Game extends JFrame {
 				break;
 			}
 		}
+		// paint player cards
 		for (Card card : board.getCurrentPlayerCards()) {
 			graphics.drawImage(card.getImage(),
 					((display_pnl.getWidth() / 2) - (board.getCurrentPlayerCards().size() * 50 / 2))
