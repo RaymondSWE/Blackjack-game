@@ -13,7 +13,11 @@ The model view controller design pattern  was chosen because it allows for a cle
 
 
 **Product pictures**
+
 ![](main-page.png)
 ![](game-page.png)
 ![](game-page2.png)
 ![](game-page3.png)
+
+
+**For further question about the coding process, contact me!**
