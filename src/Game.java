@@ -1,4 +1,5 @@
 import java.awt.*;
+import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import javax.swing.*;
@@ -21,6 +22,8 @@ public class Game extends JFrame {
 	private final Board board;
 	private int betAmount;
 	private boolean isDealerTurn;
+	
+	
 
 	// New game with player name and balance
 	public Game(String name, int balance) {
@@ -314,7 +317,7 @@ public class Game extends JFrame {
 	}
 
 	/*
-	 * As same code is repeated for each button pressed. So I made a function that
+	 * As same code is repeated for each button pressed. There is  a function that
 	 * gets recalled when to reset the board.
 	 */
 
